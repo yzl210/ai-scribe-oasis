@@ -1,5 +1,4 @@
-import {SectionGG} from './oasis/section-gg';
-import {SectionG} from './oasis/section-g';
+import {FormMap} from './forms';
 
 export interface Patient {
     id: number;
@@ -14,13 +13,13 @@ export interface Patient {
 export interface Note {
     id: number;
     patientId: number;
+    title?: string;
     audioUrl: string;
     transcript: string;
     summary: string;
-    oasisG: SectionG;
-    oasisGG: SectionGG;
+    forms: Partial<FormMap>;
     createdAt: string;
     updatedAt: string;
-    status: 'PENDING' | 'TRANSCRIBING' | 'TRANSCRIBED' | 'PROCESSING' | 'PROCESSED' | 'ERROR';
+    status: 'PENDING' | 'PROCESSING' | 'READY' | 'ERROR';
 }
 

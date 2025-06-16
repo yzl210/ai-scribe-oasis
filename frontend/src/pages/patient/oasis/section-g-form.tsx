@@ -44,7 +44,7 @@ export function SectionGForm({initialData, setForm}: { initialData?: SectionG, s
                             </div>
                         </AccordionTrigger>
                         <AccordionContent>
-                            <div className="pt-2 pb-4">
+                            <div>
                                 <ScoreSelect
                                     value={data[field]}
                                     codes={SECTION_G_CODES[field]}

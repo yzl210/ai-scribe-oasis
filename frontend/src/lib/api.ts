@@ -15,13 +15,13 @@ export async function postFormData<T>(path: string, formData: FormData): Promise
     return res.json();
 }
 
-export async function patchJson<T>(path: string, string: string): Promise<T> {
+export async function requestJson<T>(path: string, method: string, json: any): Promise<T> {
     let res = await fetch(`${API_BASE}${path}`, {
-        method: 'PATCH',
+        method,
         headers: {
             'Content-Type': 'application/json',
         },
-        body: string,
+        body: JSON.stringify(json),
     });
     await handleError(res);
     return res.json();

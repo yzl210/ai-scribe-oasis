@@ -5,9 +5,11 @@ import {z} from 'zod';
 import path from 'node:path';
 import {io} from '../index';
 import {ALLOWED_AUDIO_MIME_TYPES, MAX_AUDIO_FILE_SIZE} from '@ai-scribe-oasis/shared/constants';
-import {SectionGSchema} from '@ai-scribe-oasis/shared/oasis/section-g';
-import {SectionGGSchema} from '@ai-scribe-oasis/shared/oasis/section-gg';
-import {enqueueTranscription} from '../jobs/transcribe';
+import {FormMapSchema} from '@ai-scribe-oasis/shared/forms';
+import {enqueueProcess} from '../jobs/process';
+import {enqueueGeneration} from '../jobs/generate';
+import {merge, pickBy} from 'lodash';
+import {Prisma} from '@prisma/client';
 
 const destination = process.env.AUDIO_STORAGE_PATH || './uploads/';
 
@@ -41,7 +43,7 @@ r.post('/', upload.single('audio'), async (req, res) => {
     const note = await prisma.note.create({
         data: {patientId: body.patientId, audioUrl: req.file!.path}
     });
-    await enqueueTranscription(note.id, req.file!.path);
+    await enqueueProcess(note.id, req.file!.path);
     io.to(String(note.patientId)).emit('noteCreated', note);
     res.status(202).json(note);
 });
@@ -59,22 +61,32 @@ r.get('/patient/:id', async (req, res) => {
     res.json(notes);
 });
 
+
 r.patch('/:id', async (req, res) => {
     const noteId = z.coerce.number().parse(req.params.id);
-    const body = z.object({
-        oasisG: SectionGSchema.optional(),
-        oasisGG: SectionGGSchema.optional()
-    }).parse(req.body);
+    const body = FormMapSchema.partial().parse(req.body);
 
-    const updatedNote = await prisma.note.update({
-        where: {id: noteId},
-        data: {
-            oasisG: body.oasisG,
-            oasisGG: body.oasisGG
-        }
+    const updatedNote = await prisma.$transaction(async (tx) => {
+        const note = await tx.note.findUnique({
+            where: {id: noteId},
+            select: {forms: true}
+        });
+
+
+        const existingForms = (note?.forms) || {};
+        const mergedForms = merge(existingForms, pickBy(body, v => v !== undefined));
+
+        return tx.note.update({
+            where: {id: noteId},
+            data: {
+                forms: mergedForms,
+            }
+        });
     });
+
     emitNoteUpdated(updatedNote);
-    res.status(200).json(updatedNote);
+    res.json(updatedNote);
+
 });
 
 r.get('/audio/:id', async (req, res) => {
@@ -88,6 +100,40 @@ r.get('/audio/:id', async (req, res) => {
         return;
     }
     res.sendFile(note.audioUrl, {root: '.'});
+});
+
+r.post('/:id/form', async (req, res) => {
+    const noteId = z.coerce.number().parse(req.params.id);
+    const body = z.object({
+        form: FormMapSchema.keyof(),
+    }).parse(req.body);
+
+    const note = await prisma.note.findUnique({
+        where: {id: noteId},
+        select: {transcript: true, forms: true}
+    });
+    if (!note || !note.transcript) {
+        res.status(404).json({error: 'Note not found or transcript missing'});
+        return;
+    }
+
+    const forms = note.forms as Prisma.JsonObject;
+
+    if (forms && forms[body.form]) {
+        res.status(400).json({error: `Form ${body.form} already exists for this note`});
+        return;
+    }
+    const updatedNote = await prisma.note.update({
+        where: {id: noteId},
+        data: {
+            forms: merge(forms || {}, {
+                [body.form]: null
+            })
+        }
+    });
+    emitNoteUpdated(updatedNote);
+    await enqueueGeneration(noteId, body.form, note.transcript);
+    res.status(202).json({message: 'Success'});
 });
 
 export default r;

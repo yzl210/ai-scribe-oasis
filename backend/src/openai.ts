@@ -15,7 +15,7 @@ export async function transcribeAudio(audioPath: string) {
 
 export async function generateResponse<T extends ResponseFormatTextConfig>(prompt: string, input: string, format: T) {
     const response = await client.responses.parse({
-        model: 'gpt-4.1',
+        model: 'gpt-4.1-mini',
         input: [
             {role: 'system', content: prompt},
             {role: 'user', content: input}

@@ -23,20 +23,18 @@ model Note {
   id         Int        @id @default(autoincrement())
   patientId  Int
   patient    Patient    @relation(fields: [patientId], references: [id])
+  title      String?
   audioUrl   String
   transcript String?
   summary    String?
-  oasisG     Json?
-  oasisGG    Json?
+  forms      Json?
   status     NoteStatus @default(PENDING)
   createdAt  DateTime   @default(now())
 }
 
 enum NoteStatus {
   PENDING
-  TRANSCRIBING
-  TRANSCRIBED
   PROCESSING
-  PROCESSED
+  READY
   ERROR
 }
