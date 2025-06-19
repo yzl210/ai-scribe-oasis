@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../prisma';
+import { CreatePatientSchema } from '@ai-scribe-oasis/shared/schema';
 
 const r = Router();
 
@@ -17,6 +18,14 @@ r.get('/:id', async (req, res) => {
         return;
     }
     res.json(patient);
+});
+
+r.post('/', async (req, res) => {
+    const data = CreatePatientSchema.parse(req.body);
+    const patient = await prisma.patient.create({
+        data: data as any,
+    });
+    res.status(201).json(patient);
 });
 
 export default r;
