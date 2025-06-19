@@ -1,4 +1,4 @@
-import {FormMap} from './forms';
+import { FormMap } from './forms';
 
 export interface Patient {
     id: number;
@@ -10,16 +10,23 @@ export interface Patient {
     mrn: string;
 }
 
+export interface Audio {
+    id: number;
+    noteId: number;
+    path: string;
+    transcript?: string;
+    mimetype?: string;
+    createdAt: string;
+}
+
 export interface Note {
     id: number;
     patientId: number;
     title?: string;
-    audioUrl: string;
-    transcript: string;
-    summary: string;
+    audios: Audio[];
+    summary?: string;
     forms: Partial<FormMap>;
     createdAt: string;
-    updatedAt: string;
     status: 'PENDING' | 'PROCESSING' | 'READY' | 'ERROR';
 }
 

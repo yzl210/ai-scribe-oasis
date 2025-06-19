@@ -1,16 +1,16 @@
-import {useState} from 'react';
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from '@/components/ui/dialog';
-import {Button} from '@/components/ui/button';
-import {Plus} from 'lucide-react';
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
-import {Form, FORMS} from '../../../../shared/forms.ts';
-import {ScrollArea} from '@/components/ui/scroll-area';
-import {Badge} from '@/components/ui/badge';
-import {Note} from '@ai-scribe-oasis/shared/types';
-import {requestJson} from '@/lib/api.ts';
-import {toast} from 'sonner';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FORMS } from '../../../../shared/forms.ts';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { Note } from '@ai-scribe-oasis/shared/types';
+import { requestJson } from '@/lib/api.ts';
+import { toast } from 'sonner';
 
-export function FormSelector({note}: { note: Note }) {
+export function FormSelector({ note }: { note: Note }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ export function FormSelector({note}: { note: Note }) {
         if (loading) return;
         setLoading(true);
         try {
-            await requestJson(`/notes/${note.id}/form`, 'POST', {form});
+            await requestJson(`/notes/${note.id}/form`, 'POST', { form });
             setOpen(false);
         } catch (err) {
             toast.error('Failed to add form', {
@@ -40,7 +40,7 @@ export function FormSelector({note}: { note: Note }) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="icon" className="h-8 w-8">
-                    <Plus className="h-4 w-4"/>
+                    <Plus className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
             <DialogContent>

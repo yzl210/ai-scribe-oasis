@@ -1,10 +1,10 @@
-import {z} from 'zod';
-import type {Patient} from '@ai-scribe-oasis/shared/types.ts';
-import {useEffect, useRef, useState} from 'react';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {postFormData} from '@/lib/api.ts';
-import {toast} from 'sonner';
+import { z } from 'zod';
+import type { Patient } from '@ai-scribe-oasis/shared/types.ts';
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { postFormData } from '@/lib/api.ts';
+import { toast } from 'sonner';
 import {
     Dialog,
     DialogContent,
@@ -13,9 +13,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog.tsx';
-import {Button} from '@/components/ui/button.tsx';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form.tsx';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import {
     FileUpload,
     FileUploadDropzone,
@@ -25,23 +25,23 @@ import {
     FileUploadItemPreview,
     FileUploadTrigger,
 } from '@/components/ui/file-upload.tsx';
-import {CircleStop, Mic, PlusCircle, Upload, X} from 'lucide-react';
-import {useReactMediaRecorder} from 'react-media-recorder';
-import {ALLOWED_AUDIO_MIME_TYPES, MAX_AUDIO_FILE_SIZE} from '@ai-scribe-oasis/shared/constants.ts';
+import { CircleStop, Mic, PlusCircle, Upload, X } from 'lucide-react';
+import { useReactMediaRecorder } from 'react-media-recorder';
+import { ALLOWED_AUDIO_MIME_TYPES, MAX_AUDIO_FILE_SIZE } from '@ai-scribe-oasis/shared/constants.ts';
 
 const uploadFormSchema = z.object({
     audio: z
-        .instanceof(File, {message: 'Audio file is required'})
+        .instanceof(File, { message: 'Audio file is required' })
         .refine((file) => file.size < MAX_AUDIO_FILE_SIZE, {
             message: 'File too large',
         })
         .refine(
             (f) => ALLOWED_AUDIO_MIME_TYPES.includes(f.type as any),
-            {message: 'File type not supported'}
+            { message: 'File type not supported' },
         ),
 });
 
-export function NewNote({patient}: { patient: Patient }) {
+export function NewNote({ patient }: { patient: Patient }) {
     const [open, setOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [mode, setMode] = useState<'upload' | 'record'>('upload');
@@ -68,7 +68,7 @@ export function NewNote({patient}: { patient: Patient }) {
     } = useReactMediaRecorder({
         audio: true,
         onStop: (_blobUrl, blob) => {
-            const file = new File([blob], `recording-${Date.now()}.wav`, {type: 'audio/wav'});
+            const file = new File([blob], `recording-${Date.now()}.wav`, { type: 'audio/wav' });
             form.setValue('audio', file);
             form.clearErrors('audio');
             clearTimer();
@@ -100,7 +100,7 @@ export function NewNote({patient}: { patient: Patient }) {
             toast.success('Note uploaded successfully');
             setOpen(false);
         } catch (err) {
-            toast.error('Upload failed', {description: String(err)});
+            toast.error('Upload failed', { description: String(err) });
         } finally {
             setUploading(false);
         }
@@ -130,7 +130,7 @@ export function NewNote({patient}: { patient: Patient }) {
             <DialogTrigger asChild>
                 <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg">
-                    <PlusCircle className="w-4 h-4 mr-2"/>
+                    <PlusCircle className="w-4 h-4 mr-2" />
                     New Note
                 </Button>
             </DialogTrigger>
@@ -154,7 +154,7 @@ export function NewNote({patient}: { patient: Patient }) {
                                     <FormField
                                         control={form.control}
                                         name="audio"
-                                        render={({field: {value, onChange}}) => (
+                                        render={({ field: { value, onChange } }) => (
                                             <FormItem className="space-y-3">
                                                 <FormLabel className="text-base font-medium">Audio File</FormLabel>
                                                 <FormControl>
@@ -179,12 +179,12 @@ export function NewNote({patient}: { patient: Patient }) {
                                                         {value ? (
                                                             <FileUploadItem value={value}
                                                                             className="bg-blue-50 border-blue-200">
-                                                                <FileUploadItemPreview/>
-                                                                <FileUploadItemMetadata/>
+                                                                <FileUploadItemPreview />
+                                                                <FileUploadItemMetadata />
                                                                 <FileUploadItemDelete asChild>
                                                                     <Button variant="ghost" size="icon"
                                                                             className="size-7 hover:bg-red-100">
-                                                                        <X className="w-4 h-4"/>
+                                                                        <X className="w-4 h-4" />
                                                                     </Button>
                                                                 </FileUploadItemDelete>
                                                             </FileUploadItem>
@@ -195,7 +195,7 @@ export function NewNote({patient}: { patient: Patient }) {
                                                                     className="flex flex-col items-center gap-3 text-center py-8">
                                                                     <div
                                                                         className="flex items-center justify-center rounded-full border-2 border-blue-300 p-4 bg-white">
-                                                                        <Upload className="size-8 text-blue-600"/>
+                                                                        <Upload className="size-8 text-blue-600" />
                                                                     </div>
                                                                     <div>
                                                                         <p className="font-medium text-base text-gray-800">Drag
@@ -216,7 +216,7 @@ export function NewNote({patient}: { patient: Patient }) {
                                                         )}
                                                     </FileUpload>
                                                 </FormControl>
-                                                <FormMessage/>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -231,9 +231,9 @@ export function NewNote({patient}: { patient: Patient }) {
                                                         className="w-16 h-16 rounded-full bg-white border-2 border-blue-300 flex items-center justify-center">
                                                         {isRecording ? (
                                                             <div
-                                                                className="w-6 h-6 rounded-full bg-red-500 animate-pulse"/>
+                                                                className="w-6 h-6 rounded-full bg-red-500 animate-pulse" />
                                                         ) : (
-                                                            <Mic className="w-8 h-8 text-blue-600"/>
+                                                            <Mic className="w-8 h-8 text-blue-600" />
                                                         )}
                                                     </div>
 
@@ -246,7 +246,7 @@ export function NewNote({patient}: { patient: Patient }) {
                                                             <p className="text-red-500 text-sm mb-4">Recording...</p>
                                                             <Button type="button" variant="destructive"
                                                                     onClick={handleStopRecording} className="px-6">
-                                                                <CircleStop className="w-4 h-4 mr-2"/>
+                                                                <CircleStop className="w-4 h-4 mr-2" />
                                                                 Stop Recording
                                                             </Button>
                                                         </div>
@@ -257,7 +257,7 @@ export function NewNote({patient}: { patient: Patient }) {
                                                                 onClick={handleStartRecording}
                                                                 className="bg-blue-600 hover:bg-blue-700 px-6"
                                                             >
-                                                                <Mic className="w-4 h-4 mr-2"/>
+                                                                <Mic className="w-4 h-4 mr-2" />
                                                                 Start Recording
                                                             </Button>
                                                         </div>
@@ -273,7 +273,7 @@ export function NewNote({patient}: { patient: Patient }) {
                                                     </div>
 
                                                     <audio controls className="w-full mb-4">
-                                                        <source src={mediaBlobUrl} type="audio/wav"/>
+                                                        <source src={mediaBlobUrl} type="audio/wav" />
                                                     </audio>
 
                                                     <div className="flex justify-center gap-3">

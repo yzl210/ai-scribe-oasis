@@ -1,10 +1,10 @@
 import boss from './boss';
-import {prisma} from '../prisma';
-import {generateResponse} from '../openai';
-import {zodTextFormat} from 'openai/helpers/zod';
-import {emitNoteUpdated} from '../routes/notes';
-import {Form, FormMapSchema, FORMS} from '@ai-scribe-oasis/shared/forms';
-import {z, ZodObject, ZodTypeAny} from 'zod';
+import { prisma } from '../prisma';
+import { generateResponse } from '../openai';
+import { zodTextFormat } from 'openai/helpers/zod';
+import { emitNoteUpdated } from '../routes/notes';
+import { Form, FormMapSchema, FORMS } from '@ai-scribe-oasis/shared/forms';
+import { z, ZodObject, ZodTypeAny } from 'zod';
 
 const QUEUE = 'generate';
 
@@ -20,7 +20,7 @@ type GenerateJob = {
 }
 
 export async function enqueueGeneration(noteId: number, form: Form, transcript: string) {
-    await boss.send(QUEUE, {noteId, form, transcript});
+    await boss.send(QUEUE, { noteId, form, transcript });
 }
 
 type Responses<T> = T extends ZodObject<infer Shape>
@@ -34,7 +34,7 @@ async function buildResponses<
     prompt: string,
     transcript: string,
     maxDepth = 2,
-    path: string[] = []
+    path: string[] = [],
 ): Promise<Responses<T>> {
     if (schema instanceof z.ZodNullable || schema instanceof z.ZodOptional) {
         return buildResponses(
@@ -42,25 +42,30 @@ async function buildResponses<
             prompt,
             transcript,
             maxDepth,
-            path
+            path,
         ) as Promise<Responses<T>>;
     }
 
     const tooDeep = path.length >= maxDepth;
 
     if (!(schema instanceof z.ZodObject) || tooDeep) {
-        const name = path.length > 0 ? path.join('_') : 'root';
+        const name = (path.length > 0 ? path.join('_') : 'root').substring(0, 64);
         const wrapper = z.object({
-            [name]: schema
+            [name]: schema,
         });
 
-        const raw = await generateResponse(
-            prompt,
-            transcript,
-            zodTextFormat(wrapper, name)
-        );
+        try {
+            const raw = await generateResponse(
+                prompt,
+                transcript,
+                zodTextFormat(wrapper, name),
+            );
+            return raw?.[name] as Responses<T>;
+        } catch (error) {
+            console.error(`Error generating response for ${name} at path ${path.join('.')}:`, error);
+            return null as unknown as Responses<T>;
+        }
 
-        return raw?.[name] as Responses<T>;
     }
 
     const entries = await Promise.all(
@@ -68,7 +73,7 @@ async function buildResponses<
             .map(async ([key, child]) => [
                 key,
                 await buildResponses(child, prompt, transcript, maxDepth, [...path, key]),
-            ] as const)
+            ] as const),
     );
 
     return Object.fromEntries(entries) as Responses<T>;
@@ -77,7 +82,7 @@ async function buildResponses<
 export async function registerGenerateJob() {
     await boss.createQueue(QUEUE);
     await boss.work<GenerateJob>(QUEUE, async ([job]) => {
-        const {noteId, form, transcript} = job.data;
+        const { noteId, form, transcript } = job.data;
         try {
             const formSchema = FormMapSchema.shape[form];
             if (!formSchema) {
@@ -88,22 +93,22 @@ export async function registerGenerateJob() {
 
             const updatedNote = await prisma.$transaction(async (tx) => {
                 const note = await tx.note.findUniqueOrThrow({
-                    where: {id: noteId},
-                    select: {forms: true}
+                    where: { id: noteId },
+                    select: { forms: true },
                 });
 
                 const currentForms = (note.forms as any) || {};
                 const newForms = {
                     ...currentForms,
-                    [form]: response
+                    [form]: response,
                 };
 
                 return tx.note.update({
-                    where: {id: noteId},
+                    where: { id: noteId },
                     data: {
-                        transcript,
                         forms: newForms,
                     },
+                    include: { audios: true },
                 });
             });
 
@@ -111,8 +116,8 @@ export async function registerGenerateJob() {
         } catch (error) {
             console.error(`Failed to process note ${noteId}:`, error);
             emitNoteUpdated(await prisma.note.update({
-                where: {id: noteId},
-                data: {status: 'ERROR'},
+                where: { id: noteId },
+                data: { status: 'ERROR' },
             }));
         }
     });

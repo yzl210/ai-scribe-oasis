@@ -4,7 +4,7 @@ import patientRoutes from './routes/patients';
 import noteRoutes from './routes/notes';
 import cors from 'cors';
 import * as http from 'node:http';
-import {Server} from 'socket.io';
+import { Server } from 'socket.io';
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use('/notes', noteRoutes);
 const server = http.createServer(app);
 export const io = new Server(server, {
     path: '/ws',
-    cors: {origin: process.env.CLIENT_ORIGIN}
+    cors: { origin: process.env.CLIENT_ORIGIN },
 });
 
 io.on('connection', socket => {

@@ -1,15 +1,15 @@
-import {Router} from 'express';
+import { Router } from 'express';
 import multer from 'multer';
-import {prisma} from '../prisma';
-import {z} from 'zod';
+import { prisma } from '../prisma';
+import { z } from 'zod';
 import path from 'node:path';
-import {io} from '../index';
-import {ALLOWED_AUDIO_MIME_TYPES, MAX_AUDIO_FILE_SIZE} from '@ai-scribe-oasis/shared/constants';
-import {FormMapSchema} from '@ai-scribe-oasis/shared/forms';
-import {enqueueProcess} from '../jobs/process';
-import {enqueueGeneration} from '../jobs/generate';
-import {merge, pickBy} from 'lodash';
-import {Prisma} from '@prisma/client';
+import { io } from '../index';
+import { ALLOWED_AUDIO_MIME_TYPES, MAX_AUDIO_FILE_SIZE } from '@ai-scribe-oasis/shared/constants';
+import { FormMapSchema } from '@ai-scribe-oasis/shared/forms';
+import { enqueueProcess } from '../jobs/transcribe';
+import { enqueueGeneration } from '../jobs/generate';
+import { merge, pickBy } from 'lodash';
+import { Prisma } from '@prisma/client';
 
 const destination = process.env.AUDIO_STORAGE_PATH || './uploads/';
 
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    limits: {fileSize: MAX_AUDIO_FILE_SIZE},
+    limits: { fileSize: MAX_AUDIO_FILE_SIZE },
     fileFilter: (_req, file, cb) => {
         if (ALLOWED_AUDIO_MIME_TYPES.includes(file.mimetype as any)) {
             cb(null, true);
@@ -29,8 +29,8 @@ const upload = multer({
             cb(
                 new multer.MulterError(
                     'LIMIT_UNEXPECTED_FILE',
-                    'Only MP3, WAV, or M4A files are allowed'
-                )
+                    'Only MP3, WAV, or M4A files are allowed',
+                ),
             );
         }
     },
@@ -38,25 +38,73 @@ const upload = multer({
 
 const r = Router();
 
-r.post('/', upload.single('audio'), async (req, res) => {
-    const body = z.object({patientId: z.coerce.number()}).parse(req.body);
+r.post('/audio', upload.single('audio'), async (req, res) => {
+    const body = z.object({ patientId: z.coerce.number() }).parse(req.body);
     const note = await prisma.note.create({
-        data: {patientId: body.patientId, audioUrl: req.file!.path}
+        data: {
+            patientId: body.patientId,
+            audios: {
+                create: {
+                    path: req.file!.path,
+                    mimetype: req.file!.mimetype,
+                },
+            },
+        },
+        include: { audios: true },
     });
-    await enqueueProcess(note.id, req.file!.path);
+    await enqueueProcess(note.audios[0].id);
     io.to(String(note.patientId)).emit('noteCreated', note);
     res.status(202).json(note);
 });
 
+r.post('/:id/audio', upload.single('audio'), async (req, res) => {
+    const noteId = z.coerce.number().parse(req.params.id);
+
+    const note = await prisma.note.findUnique({
+        where: { id: noteId },
+        select: { status: true },
+    });
+
+    if (!note) {
+        res.status(404).json({ error: 'Note not found' });
+        return;
+    }
+
+    if (note.status !== 'READY') {
+        res.status(400).json({ error: 'Note not ready for audio upload' });
+        return;
+    }
+
+    const audio = await prisma.audio.create({
+        data: {
+            noteId,
+            path: req.file!.path,
+            mimetype: req.file!.mimetype,
+        },
+    });
+
+    const updatedNote = await prisma.note.findUniqueOrThrow({
+        where: { id: noteId },
+        include: { audios: true },
+    });
+
+    await enqueueProcess(audio.id);
+    emitNoteUpdated(updatedNote);
+    res.status(202).json(audio);
+});
+
 r.get('/', async (_req, res) => {
-    const notes = await prisma.note.findMany();
+    const notes = await prisma.note.findMany({
+        include: { audios: true },
+    });
     res.json(notes);
 });
 
 r.get('/patient/:id', async (req, res) => {
     const patientId = z.coerce.number().parse(req.params.id);
     const notes = await prisma.note.findMany({
-        where: {patientId}
+        where: { patientId },
+        include: { audios: true },
     });
     res.json(notes);
 });
@@ -68,8 +116,8 @@ r.patch('/:id', async (req, res) => {
 
     const updatedNote = await prisma.$transaction(async (tx) => {
         const note = await tx.note.findUnique({
-            where: {id: noteId},
-            select: {forms: true}
+            where: { id: noteId },
+            select: { forms: true },
         });
 
 
@@ -77,29 +125,28 @@ r.patch('/:id', async (req, res) => {
         const mergedForms = merge(existingForms, pickBy(body, v => v !== undefined));
 
         return tx.note.update({
-            where: {id: noteId},
+            where: { id: noteId },
             data: {
                 forms: mergedForms,
-            }
+            },
+            include: { audios: true },
         });
     });
 
     emitNoteUpdated(updatedNote);
     res.json(updatedNote);
-
 });
 
-r.get('/audio/:id', async (req, res) => {
-    const noteId = z.coerce.number().parse(req.params.id);
-    const note = await prisma.note.findUnique({
-        where: {id: noteId},
-        select: {audioUrl: true}
+r.get('/audio/:audioId', async (req, res) => {
+    const audioId = z.coerce.number().parse(req.params.audioId);
+    const audio = await prisma.audio.findUnique({
+        where: { id: audioId },
     });
-    if (!note || !note.audioUrl) {
-        res.status(404).json({error: 'Audio not found'});
+    if (!audio) {
+        res.status(404).json({ error: 'Audio not found' });
         return;
     }
-    res.sendFile(note.audioUrl, {root: '.'});
+    res.sendFile(audio.path, { root: '.' });
 });
 
 r.post('/:id/form', async (req, res) => {
@@ -109,31 +156,41 @@ r.post('/:id/form', async (req, res) => {
     }).parse(req.body);
 
     const note = await prisma.note.findUnique({
-        where: {id: noteId},
-        select: {transcript: true, forms: true}
+        where: { id: noteId },
+        select: { status: true, forms: true, audios: { select: { transcript: true } } },
     });
-    if (!note || !note.transcript) {
-        res.status(404).json({error: 'Note not found or transcript missing'});
+    if (!note) {
+        res.status(404).json({ error: 'Note not found' });
+        return;
+    }
+
+    if (note.status !== 'READY') {
+        res.status(400).json({ error: 'Note not ready for form generation' });
+        return;
+    }
+
+    const transcripts = note.audios.filter(a => a.transcript).map(a => a.transcript);
+    if (transcripts.length === 0) {
+        res.status(400).json({ error: 'No transcripts available for this note' });
         return;
     }
 
     const forms = note.forms as Prisma.JsonObject;
 
-    if (forms && forms[body.form]) {
-        res.status(400).json({error: `Form ${body.form} already exists for this note`});
-        return;
-    }
     const updatedNote = await prisma.note.update({
-        where: {id: noteId},
+        where: { id: noteId },
         data: {
             forms: merge(forms || {}, {
-                [body.form]: null
-            })
-        }
+                [body.form]: null,
+            }),
+        },
+        include: { audios: true },
     });
     emitNoteUpdated(updatedNote);
-    await enqueueGeneration(noteId, body.form, note.transcript);
-    res.status(202).json({message: 'Success'});
+
+    const combinedTranscript = transcripts.join('\n\n');
+    await enqueueGeneration(noteId, body.form, combinedTranscript);
+    res.status(202).json({ message: 'Success' });
 });
 
 export default r;

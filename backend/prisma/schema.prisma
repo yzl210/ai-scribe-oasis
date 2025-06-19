@@ -24,12 +24,21 @@ model Note {
   patientId  Int
   patient    Patient    @relation(fields: [patientId], references: [id])
   title      String?
-  audioUrl   String
-  transcript String?
+  audios Audio[]
   summary    String?
   forms      Json?
   status     NoteStatus @default(PENDING)
   createdAt  DateTime   @default(now())
+}
+
+model Audio {
+  id         Int      @id @default(autoincrement())
+  noteId     Int
+  note       Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  path       String
+  transcript String?
+  mimetype   String?
+  createdAt  DateTime @default(now())
 }
 
 enum NoteStatus {

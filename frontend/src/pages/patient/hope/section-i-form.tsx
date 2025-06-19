@@ -1,9 +1,9 @@
 'use client';
 
-import {useState} from 'react';
-import {Checkbox} from '@/components/ui/checkbox';
-import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import { useState } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     I0010,
     SECTION_I_CATEGORIES,
@@ -11,22 +11,22 @@ import {
     type SectionI,
     SectionISchema,
 } from '@ai-scribe-oasis/shared/hope/section-i.ts';
-import {createNull} from '@ai-scribe-oasis/shared/utils.ts';
-import {Separator} from '@/components/ui/separator';
+import { createNull } from '@ai-scribe-oasis/shared/utils.ts';
+import { Separator } from '@/components/ui/separator';
 
-export function SectionIForm({initialData, setForm}: { initialData?: SectionI; setForm: (data: SectionI) => void }) {
+export function SectionIForm({ initialData, setForm }: { initialData?: SectionI; setForm: (data: SectionI) => void }) {
     const [data, setData] = useState<SectionI>(initialData || createNull(SectionISchema));
 
     const categories = Object.entries(SECTION_I_CATEGORIES);
 
     const handlePrincipalDiagnosis = (value: string | null) => {
-        const newData = {...data, I0010: value} as SectionI;
+        const newData = { ...data, I0010: value } as SectionI;
         setData(newData);
         setForm(newData);
     };
 
     const handleCondition = (field: keyof SectionI, checked: boolean | 'indeterminate') => {
-        const newData = {...data, [field]: checked === true} as any;
+        const newData = { ...data, [field]: checked === true } as any;
         setData(newData);
         setForm(newData);
     };
@@ -42,7 +42,7 @@ export function SectionIForm({initialData, setForm}: { initialData?: SectionI; s
                 <Label className="font-medium">I0010. Principal Diagnosis</Label>
                 <Select value={data.I0010 || ''} onValueChange={handlePrincipalDiagnosis}>
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select principal diagnosis"/>
+                        <SelectValue placeholder="Select principal diagnosis" />
                     </SelectTrigger>
                     <SelectContent>
                         {Object.entries(I0010).map(([code, description]) => (
@@ -58,7 +58,7 @@ export function SectionIForm({initialData, setForm}: { initialData?: SectionI; s
             <div className="space-y-6">
                 {categories.map(([category, fields], index) => (
                     <div key={category}>
-                        {index > 0 && <Separator className="mb-4"/>}
+                        {index > 0 && <Separator className="mb-4" />}
                         <div className="space-y-3">
                             <h3 className="font-medium text-gray-700">{category}</h3>
                             {fields.map((field) => {

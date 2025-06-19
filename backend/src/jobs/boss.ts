@@ -1,12 +1,14 @@
 import PgBoss from 'pg-boss';
-import {registerProcessJob} from './process';
-import {registerGenerateJob} from './generate';
+import { registerTranscribeJob } from './transcribe';
+import { registerGenerateJob } from './generate';
+import { registerSummarizeJob } from './summarize';
 
 const boss = new PgBoss(process.env.DATABASE_URL!);
 
 async function main() {
     await boss.start();
-    await registerProcessJob();
+    await registerTranscribeJob();
+    await registerSummarizeJob();
     await registerGenerateJob();
 }
 

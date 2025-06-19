@@ -1,10 +1,12 @@
-import {z} from 'zod';
-import {OASIS_PROMPT, OASISSchema} from './oasis/oasis';
-import {HOPE_PROMPT, HOPESchema} from './hope/hope';
+import { z } from 'zod';
+import { OASIS_PROMPT, OASISSchema } from './oasis/oasis';
+import { HOPE_PROMPT, HOPESchema } from './hope/hope';
+import { VisitFormSchema } from './visit/visit-form';
 
 export const FormMapSchema = z.object({
     'home-health-oasis-soc': OASISSchema,
     'hospice-hope-soc': HOPESchema,
+    'visit-form': VisitFormSchema,
 });
 
 export type FormMap = z.infer<typeof FormMapSchema>;
@@ -35,5 +37,13 @@ export const FORMS: Record<Form, FormInfo> = {
         description: 'HOPE assessment for hospice start of care',
         sections: ['Section I: Active Diagnoses', 'Section J: Health Conditions', 'Section M: Skin Conditions', 'Section N: Medications'],
         prompt: HOPE_PROMPT,
-    }
+    },
+    'visit-form': {
+        id: 'visit-form',
+        name: 'Visit Form',
+        shortName: 'Visit Form',
+        description: 'Visit form for home health nursing encounters',
+        sections: ['Visit Information', 'Symptom Assessment', 'Psychological & Cognitive', 'Interventions', 'Assessment/Impression', 'Plan of Care', 'Patient & Family Education & Response', 'Care Coordination'],
+        prompt: '',
+    },
 } as const;

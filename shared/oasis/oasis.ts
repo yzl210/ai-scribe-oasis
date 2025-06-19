@@ -1,12 +1,12 @@
-import {SECTION_G_CODES, SECTION_G_DESCRIPTIONS, SECTION_G_TITLES, SectionGSchema} from './section-g';
+import { SECTION_G_CODES, SECTION_G_DESCRIPTIONS, SECTION_G_TITLES, SectionGSchema } from './section-g';
 import {
     SECTION_GG_CODES,
     SECTION_GG_DESCRIPTIONS,
     SECTION_GG_OPTIONS,
     SECTION_GG_TITLES,
-    SectionGGSchema
+    SectionGGSchema,
 } from './section-gg';
-import {z} from 'zod';
+import { z } from 'zod';
 
 export const OASISSchema = z.object({
     G: SectionGSchema.nullish(),

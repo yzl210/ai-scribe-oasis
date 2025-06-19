@@ -1,9 +1,9 @@
 'use client';
 
-import {useState} from 'react';
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Label} from '@/components/ui/label';
-import {ArrowToggles, DateSelect, ScoreSelect, useAccordion} from '@/pages/patient/form.tsx';
+import { useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Label } from '@/components/ui/label';
+import { ArrowToggles, DateSelect, ScoreSelect, useAccordion } from '@/pages/patient/form.tsx';
 import {
     N0500A,
     N0510A,
@@ -13,13 +13,13 @@ import {
     type SectionN,
     SectionNSchema,
 } from '@ai-scribe-oasis/shared/hope/section-n.ts';
-import {createNull} from '@ai-scribe-oasis/shared/utils.ts';
+import { createNull } from '@ai-scribe-oasis/shared/utils.ts';
 
-export function SectionNForm({initialData, setForm}: { initialData?: SectionN; setForm: (data: SectionN) => void }) {
+export function SectionNForm({ initialData, setForm }: { initialData?: SectionN; setForm: (data: SectionN) => void }) {
     const [data, setData] = useState<SectionN>(initialData || createNull(SectionNSchema));
 
     const sections = Object.keys(SectionNSchema.shape);
-    const {open, setOpen, openAll, closeAll} = useAccordion(sections);
+    const { open, setOpen, openAll, closeAll } = useAccordion(sections);
 
     const update = (path: (string | number)[], value: any) => {
         const newData = structuredClone(data);
@@ -44,8 +44,8 @@ export function SectionNForm({initialData, setForm}: { initialData?: SectionN; s
         <div className="space-y-6">
             <div className="flex gap-2 mb-4 items-center">
                 <h2 className="text-lg font-semibold">Section N: Medications</h2>
-                <div className="flex-1"/>
-                <ArrowToggles onExpand={openAll} onCollapse={closeAll}/>
+                <div className="flex-1" />
+                <ArrowToggles onExpand={openAll} onCollapse={closeAll} />
             </div>
 
             <Accordion type="multiple" value={open} onValueChange={setOpen} className="w-full">

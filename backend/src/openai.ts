@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import * as fs from 'node:fs';
-import {ResponseFormatTextConfig} from 'openai/src/resources/responses/responses';
+import { ResponseFormatTextConfig } from 'openai/src/resources/responses/responses';
 
 const client = new OpenAI();
 
@@ -17,12 +17,12 @@ export async function generateResponse<T extends ResponseFormatTextConfig>(promp
     const response = await client.responses.parse({
         model: 'gpt-4.1-mini',
         input: [
-            {role: 'system', content: prompt},
-            {role: 'user', content: input}
+            { role: 'system', content: prompt },
+            { role: 'user', content: input },
         ],
         text: {
-            format
-        }
+            format,
+        },
     });
     return response.output_parsed;
 }

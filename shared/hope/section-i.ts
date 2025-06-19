@@ -1,5 +1,5 @@
-import {z} from 'zod';
-import {keysToSchema, zodEnumFromObject} from '../utils';
+import { z } from 'zod';
+import { keysToSchema, zodEnumFromObject } from '../utils';
 
 export const I0010 = {
     '01': 'Cancer',
@@ -12,14 +12,14 @@ export const I0010 = {
     '08': 'Liver Disease',
     '09': 'Renal Disease',
     '99': 'None of the above',
-} as const;
+} as const
 export const I0010Schema = zodEnumFromObject(I0010);
 
 
 export const SectionISchema = z.object({
     I0010: I0010Schema.nullable(),
-    ...keysToSchema(['I0100', 'I0600', 'I0900', 'I0950', 'I1101', 'I1510', 'I2102', 'I2900', 'I2910', 'I4501', 'I4801', 'I5150', 'I5401', 'I6202', 'I8005'], z.boolean().nullable())
-});
+    ...keysToSchema(['I0100', 'I0600', 'I0900', 'I0950', 'I1101', 'I1510', 'I2102', 'I2900', 'I2910', 'I4501', 'I4801', 'I5150', 'I5401', 'I6202', 'I8005'], z.boolean().nullable()),
+})
 
 export type SectionI = z.infer<typeof SectionISchema>;
 
@@ -40,7 +40,7 @@ export const SECTION_I_TITLES = {
     I5401: 'Seizure Disorder',
     I6202: 'Chronic Obstructive Pulmonary Disease (COPD)',
     I8005: 'Other Medical Condition',
-} as const;
+} as const
 
 export const SECTION_I_CATEGORIES = {
     'Cancer': ['I0100'],
@@ -52,8 +52,8 @@ export const SECTION_I_CATEGORIES = {
     'Neurological': ['I4501', 'I4801', 'I5150', 'I5401'],
     'Pulmonary': ['I6202'],
     'Other': ['I8005'],
-} as const;
+} as const
 
 export const SECTION_I_CODES = {
-    I0010
-} as const;
+    I0010,
+} as const

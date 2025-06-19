@@ -1,5 +1,5 @@
-import {io, Socket} from 'socket.io-client';
-import {API_BASE} from '@/lib/api.ts';
+import { io, Socket } from 'socket.io-client';
+import { API_BASE } from '@/lib/api.ts';
 
 let socket: Socket | undefined;
 

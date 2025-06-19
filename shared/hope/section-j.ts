@@ -1,48 +1,48 @@
-import {z} from 'zod';
-import {keysToSchema, zodEnumFromObject} from '../utils';
+import { z } from 'zod';
+import { keysToSchema, zodEnumFromObject } from '../utils';
 
 export const J0050 = {
     '0': 'No',
     '1': 'Yes',
-};
+}
 export const J0050Schema = zodEnumFromObject(J0050);
 
 export const J0900A = {
     '0': 'No — Skip to J0905, Pain Active Problem',
     '1': 'Yes',
-};
+}
 export const J0900C = {
     '0': 'None',
     '1': 'Mild',
     '2': 'Moderate',
     '3': 'Severe',
     '9': 'Pain not rated',
-} as const;
+} as const
 export const J0900D = {
     '1': 'Numeric',
     '2': 'Verbal descriptor',
     '3': 'Patient visual',
     '4': 'Staff observation',
     '9': 'No standardized tool used',
-} as const;
+} as const
 export const J0900Schema = z.object({
     A: zodEnumFromObject(J0900A).nullable(),
     B: z.coerce.date().nullable(),
     C: zodEnumFromObject(J0900C).nullable(),
     D: zodEnumFromObject(J0900D).nullable(),
-});
+})
 
 export const J0905 = {
     '0': 'No — Skip to J2030, Screening for Shortness of Breath',
     '1': 'Yes',
-};
+}
 export const J0905Schema = zodEnumFromObject(J0905);
 
 
 export const J0910A = {
     '0': 'No — Skip to J2030, Screening for Shortness of Breath',
     '1': 'Yes',
-};
+}
 export const J0910C = {
     '1': 'Location',
     '2': 'Severity',
@@ -52,51 +52,51 @@ export const J0910C = {
     '6': 'What relieves/worsens pain',
     '7': 'Effect on function or quality of life',
     '9': 'None of the above',
-} as const;
+} as const
 export const J0910Schema = z.object({
     A: zodEnumFromObject(J0910A).nullable(),
     B: z.coerce.date().nullable(),
     C: z.object(keysToSchema(Object.keys(J0910C), z.boolean().nullable())),
-});
+})
 
 export const J0915 = {
     '0': 'No',
     '1': 'Yes',
-} as const;
+} as const
 export const J0915Schema = zodEnumFromObject(J0915);
 
 export const J2030A = {
     '0': 'No — Skip to J2050, Symptom Impact Screening',
     '1': 'Yes',
-} as const;
+} as const
 export const J2030C = {
     '0': 'No — Skip to J2050, Symptom Impact Screening',
     '1': 'Yes',
-} as const;
+} as const
 export const J2030Schema = z.object({
     A: zodEnumFromObject(J2030A).nullable(),
     B: z.coerce.date().nullable(),
     C: zodEnumFromObject(J2030C).nullable(),
-});
+})
 
 export const J2040A = {
     '0': 'No — Skip to J2050, Symptom Impact Screening',
     '1': 'No, patient declined treatment — Skip to J2050, Symptom Impact Screening',
     '2': 'Yes',
-} as const;
+} as const
 export const J2040Schema = z.object({
     A: zodEnumFromObject(J2040A).nullable(),
     B: z.coerce.date().nullable(),
-});
+})
 
 export const J2050A = {
     '0': 'No — Skip to M1190, Skin Conditions',
     '1': 'Yes',
-} as const;
+} as const
 export const J2050Schema = z.object({
     A: zodEnumFromObject(J2050A).nullable(),
     B: z.string().nullable(),
-});
+})
 
 
 export const SYMPTOM_IMPACTS = {
@@ -105,38 +105,38 @@ export const SYMPTOM_IMPACTS = {
     '2': 'Moderate',
     '3': 'Severe',
     '9': 'Not applicable (the patient is not experiencing the symptom)',
-} as const;
+} as const
 export const SymptomImpactSchema = zodEnumFromObject(SYMPTOM_IMPACTS);
 
 export const J2051Schema = z.object(
     keysToSchema(
         ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
-        SymptomImpactSchema.nullable()
-    )
-);
+        SymptomImpactSchema.nullable(),
+    ),
+)
 
 export const J2052A = {
     '0': 'No — Skip to J2052C. Reason SFV Not Completed.',
     '1': 'Yes',
-} as const;
+} as const
 export const J2052C = {
     '1': 'Patient and/or caregiver declined an in‑person visit.',
     '2': 'Patient unavailable (e.g., in ED, hospital, travel outside of service area, expired).',
     '3': 'Attempts to contact patient and/or caregiver were unsuccessful.',
     '9': 'None of the above',
-} as const;
+} as const
 export const J2052Schema = z.object({
     A: zodEnumFromObject(J2052A).nullable(),
     B: z.coerce.date().nullable(),
     C: zodEnumFromObject(J2052C).nullable(),
-});
+})
 
 export const J2053Schema = z.object(
     keysToSchema(
         ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as const,
-        SymptomImpactSchema.nullable()
-    )
-);
+        SymptomImpactSchema.nullable(),
+    ),
+)
 
 export const SectionJSchema = z.object({
     J0050: J0050Schema.nullable(),
@@ -150,7 +150,7 @@ export const SectionJSchema = z.object({
     J2051: J2051Schema.nullable(),
     J2052: J2052Schema.nullable(),
     J2053: J2053Schema.nullable(),
-});
+})
 export type SectionJ = z.infer<typeof SectionJSchema>;
 
 export const SECTION_J_TITLES = {
@@ -164,8 +164,8 @@ export const SECTION_J_TITLES = {
     J2050: 'Symptom Impact Screening',
     J2051: 'Symptom Impact',
     J2052: 'Symptom Follow-up Visit (SFV) (complete only if any response to J2051 Symptom Impact = 2. Moderate or 3. Severe)',
-    J2053: 'SFV Symptom Impact'
-} as const;
+    J2053: 'SFV Symptom Impact',
+} as const
 
 export const SECTION_J_DESCRIPTIONS = {
     J0050: 'At the time of this assessment and based on your clinical assessment, does the patient appear to have a life expectancy of 3 days or less?',
@@ -222,8 +222,8 @@ export const SECTION_J_DESCRIPTIONS = {
         F: 'Diarrhea',
         G: 'Constipation',
         H: 'Agitation',
-    }
-} as const;
+    },
+} as const
 
 export const SECTION_J_CODES = {
     J0050,
@@ -240,4 +240,4 @@ export const SECTION_J_CODES = {
     J2050A,
     J2052A,
     J2052C,
-} as const;
+} as const

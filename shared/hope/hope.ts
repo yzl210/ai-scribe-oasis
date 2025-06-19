@@ -1,8 +1,8 @@
-import {z} from 'zod';
-import {SECTION_I_CODES, SECTION_I_TITLES, SectionISchema} from './section-i';
-import {SECTION_J_CODES, SECTION_J_DESCRIPTIONS, SECTION_J_TITLES, SectionJSchema} from './section-j';
-import {SECTION_M_DESCRIPTIONS, SECTION_M_TITLES, SectionMSchema} from './section-m';
-import {SECTION_N_CODES, SECTION_N_DESCRIPTIONS, SECTION_N_TITLES, SectionNSchema} from './section-n';
+import { z } from 'zod';
+import { SECTION_I_CODES, SECTION_I_TITLES, SectionISchema } from './section-i';
+import { SECTION_J_CODES, SECTION_J_DESCRIPTIONS, SECTION_J_TITLES, SectionJSchema } from './section-j';
+import { SECTION_M_DESCRIPTIONS, SECTION_M_TITLES, SectionMSchema } from './section-m';
+import { SECTION_N_CODES, SECTION_N_DESCRIPTIONS, SECTION_N_TITLES, SectionNSchema } from './section-n';
 
 export const HOPESchema = z.object({
     I: SectionISchema.nullish(),

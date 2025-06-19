@@ -1,10 +1,10 @@
 'use client';
 
-import {useState} from 'react';
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Label} from '@/components/ui/label';
-import {Checkbox} from '@/components/ui/checkbox';
-import {ArrowToggles, DateSelect, ScoreSelect, useAccordion} from '@/pages/patient/form.tsx';
+import { useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowToggles, DateSelect, ScoreSelect, useAccordion } from '@/pages/patient/form.tsx';
 import {
     J0050,
     J0900A,
@@ -23,13 +23,13 @@ import {
     SectionJSchema,
     SYMPTOM_IMPACTS,
 } from '@ai-scribe-oasis/shared/hope/section-j.ts';
-import {createNull} from '@ai-scribe-oasis/shared/utils.ts';
+import { createNull } from '@ai-scribe-oasis/shared/utils.ts';
 
-export function SectionJForm({initialData, setForm}: { initialData?: SectionJ; setForm: (data: SectionJ) => void }) {
+export function SectionJForm({ initialData, setForm }: { initialData?: SectionJ; setForm: (data: SectionJ) => void }) {
     const [data, setData] = useState<SectionJ>(initialData || createNull(SectionJSchema));
 
     const sections = Object.keys(SectionJSchema.shape);
-    const {open, setOpen, openAll, closeAll} = useAccordion(sections);
+    const { open, setOpen, openAll, closeAll } = useAccordion(sections);
 
     const update = (path: (string | number)[], value: any) => {
         const newData = structuredClone(data);
@@ -53,8 +53,8 @@ export function SectionJForm({initialData, setForm}: { initialData?: SectionJ; s
         <div className="space-y-6">
             <div className="flex gap-2 mb-4 items-center">
                 <h2 className="text-lg font-semibold">Section J: Pain and Other Symptoms</h2>
-                <div className="flex-1"/>
-                <ArrowToggles onExpand={openAll} onCollapse={closeAll}/>
+                <div className="flex-1" />
+                <ArrowToggles onExpand={openAll} onCollapse={closeAll} />
             </div>
 
             <Accordion type="multiple" value={open} onValueChange={setOpen} className="w-full">

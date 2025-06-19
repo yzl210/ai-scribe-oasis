@@ -1,5 +1,5 @@
-import {z} from 'zod';
-import {keysToSchema, zodEnumFromObject} from '../utils';
+import { z } from 'zod';
+import { keysToSchema, zodEnumFromObject } from '../utils';
 
 /* Section GG: Functional Abilities */
 
@@ -22,7 +22,7 @@ export const GG_PERFORMANCE = {
     '07': 'Patient refused',
     '09': 'Not applicable – Not attempted and the patient did not perform this activity prior to the current illness, exacerbation or injury.',
     '10': 'Not attempted due to environmental limitations (e.g., lack of equipment, weather constraints)',
-    '88': 'Not attempted due to medical conditions or safety concerns'
+    '88': 'Not attempted due to medical conditions or safety concerns',
 } as const;
 export const GGPerformanceSchema = zodEnumFromObject(GG_PERFORMANCE);
 
@@ -35,7 +35,7 @@ export const GGWheelchairTypeSchema = zodEnumFromObject(GG_WHEELCHAIR_TYPE);
 export const SECTION_GG_CODES = {
     GG0100,
     GG_PERFORMANCE,
-    GG_WHEELCHAIR_TYPE
+    GG_WHEELCHAIR_TYPE,
 };
 
 export const SectionGGSchema = z.object({
@@ -55,7 +55,7 @@ export const SectionGGSchema = z.object({
             S: GGPerformanceSchema.nullable(),
             SS1: GGWheelchairTypeSchema.nullable(),
         }),
-    })
+    }),
 });
 
 export type SectionGG = z.infer<typeof SectionGGSchema>;
@@ -71,8 +71,8 @@ export const SECTION_GG_TITLES = {
     GG0170: {
         1: 'Mobility - SOC/ROC',
         4: 'Mobility - Follow-up',
-        3: 'Mobility - Discharge'
-    }
+        3: 'Mobility - Discharge',
+    },
 } as const;
 
 export const SECTION_GG_DESCRIPTIONS = {
@@ -81,13 +81,13 @@ export const SECTION_GG_DESCRIPTIONS = {
     GG0130: {
         1: 'Code the patient’s usual performance at SOC/ROC for each activity using the 6-point scale. If activity was not attempted at SOC/ ROC, code the reason.',
         4: 'Code the patient’s usual performance at Follow-up for each activity using the 6-point scale. If activity was not attempted at Follow-up, code the reason.',
-        3: 'Code the patient’s usual performance at Discharge for each activity using the 6-point scale. If activity was not attempted at Discharge, code the reason.'
+        3: 'Code the patient’s usual performance at Discharge for each activity using the 6-point scale. If activity was not attempted at Discharge, code the reason.',
     },
     GG0170: {
         1: 'Code the patient’s usual performance at SOC/ROC for each activity using the 6-point scale. If activity was not attempted at SOC/ ROC, code the reason.',
         4: 'Code the patient’s usual performance at Follow-up for each activity using the 6-point scale. If activity was not attempted at Follow-up code the reason.',
-        3: 'Code the patient’s usual performance at Discharge for each activity using the 6-point scale. If activity was not attempted at Discharge, code the reason.'
-    }
+        3: 'Code the patient’s usual performance at Discharge for each activity using the 6-point scale. If activity was not attempted at Discharge, code the reason.',
+    },
 } as const;
 
 export const SECTION_GG_OPTIONS = {
@@ -95,7 +95,7 @@ export const SECTION_GG_OPTIONS = {
         A: 'Self Care: Code the patient’s need for assistance with bathing, dressing, using the toilet, and eating prior to the current illness, exacerbation, or injury.',
         B: 'Indoor Mobility (Ambulation): Code the patient’s need for assistance with walking from room to room (with or without a device such as cane, crutch or walker) prior to the current illness, exacerbation, or injury.',
         C: 'Stairs: Code the patient’s need for assistance with internal or external stairs (with or without a device such as cane, crutch, or walker) prior to the current illness, exacerbation, or injury.',
-        D: 'Functional Cognition: Code the patient’s need for assistance with planning regular tasks, such as shopping or remembering to take medication prior to the current illness, exacerbation, or injury.'
+        D: 'Functional Cognition: Code the patient’s need for assistance with planning regular tasks, such as shopping or remembering to take medication prior to the current illness, exacerbation, or injury.',
     },
     GG0110: {
         A: 'Manual wheelchair',
@@ -103,7 +103,7 @@ export const SECTION_GG_OPTIONS = {
         C: 'Mechanical lift',
         D: 'Walker',
         E: 'Orthotics/prosthetics',
-        Z: 'None of the above'
+        Z: 'None of the above',
     },
     GG0130: {
         A: 'Eating: The ability to use suitable utensils to bring food and/or liquid to the mouth and swallow food and/or liquid once the meal is placed before the patient.',
@@ -135,5 +135,5 @@ export const SECTION_GG_OPTIONS = {
         RR1: 'Indicate the type of wheelchair or scooter used',
         S: 'Wheel 150 feet: Once seated in wheelchair/scooter, the ability to wheel at least 150 feet in a corridor or similar space.',
         SS1: 'Indicate the type of wheelchair or scooter used',
-    }
+    },
 } as const;

@@ -1,11 +1,12 @@
-import {useState} from 'react';
-import {Button, buttonVariants} from '@/components/ui/button.tsx';
-import {ArrowDownToLine, ArrowUpToLine, CalendarIcon, ChevronDownIcon} from 'lucide-react';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select.tsx';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover.tsx';
-import {Calendar} from '@/components/ui/calendar.tsx';
-import {cn} from '@/lib/utils.ts';
-import {format} from 'date-fns';
+import { useState } from 'react';
+import { Button, buttonVariants } from '@/components/ui/button.tsx';
+import { ArrowDownToLine, ArrowUpToLine, CalendarIcon, ChevronDownIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { Calendar } from '@/components/ui/calendar.tsx';
+import { cn } from '@/lib/utils.ts';
+import { format } from 'date-fns';
+import { TimePicker12 } from '@/components/ui/time-picker/time-picker.tsx';
 
 export interface FormProps {
     initialData?: Object;
@@ -22,17 +23,17 @@ export function useAccordion(keys: string[]) {
     } as const;
 }
 
-export function ArrowToggles({onExpand, onCollapse}: {
+export function ArrowToggles({ onExpand, onCollapse }: {
     onExpand: () => void;
     onCollapse: () => void;
 }) {
     return (
         <>
             <Button variant="outline" size="sm" onClick={onExpand} className="text-xs">
-                <ArrowDownToLine className="w-3 h-3"/>
+                <ArrowDownToLine className="w-3 h-3" />
             </Button>
             <Button variant="outline" size="sm" onClick={onCollapse} className="text-xs">
-                <ArrowUpToLine className="w-3 h-3"/>
+                <ArrowUpToLine className="w-3 h-3" />
             </Button>
         </>
     );
@@ -53,7 +54,7 @@ export function ScoreSelect({
     return (
         <Select value={value ?? ''} onValueChange={(v) => onChange(v)}>
             <SelectTrigger className="w-full">
-                <SelectValue placeholder={placeholder}/>
+                <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
                 {Object.entries(codes).map(([code, desc]) => (
@@ -69,24 +70,24 @@ export function ScoreSelect({
 }
 
 export function DateSelect(
-    {date, setDate}: {
+    { date, setDate }: {
         date: Date | undefined
         setDate: (date: Date | undefined) => void
-    }
+    },
 ) {
     const [open, setOpen] = useState(false);
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger
                 className={cn(
-                    buttonVariants({variant: 'outline'}),
+                    buttonVariants({ variant: 'outline' }),
                     'w-full justify-start text-left font-normal',
-                    !date && 'text-muted-foreground'
+                    !date && 'text-muted-foreground',
                 )}
             >
-                <CalendarIcon className="mr-2 h-4 w-4"/>
+                <CalendarIcon className="mr-2 h-4 w-4" />
                 {date ? format(date, 'PPP') : 'Select date'}
-                <ChevronDownIcon className="ml-auto h-4 w-4 opacity-25"/>
+                <ChevronDownIcon className="ml-auto h-4 w-4 opacity-25" />
             </PopoverTrigger>
             <PopoverContent>
                 <Calendar
@@ -98,6 +99,43 @@ export function DateSelect(
                         setOpen(false);
                     }}
                 />
+            </PopoverContent>
+        </Popover>
+    );
+}
+
+export function DateTimeSelect(
+    { date, setDate }: {
+        date: Date | undefined
+        setDate: (date: Date | undefined) => void
+    },
+) {
+    const [open, setOpen] = useState(false);
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger
+                className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'w-full justify-start text-left font-normal',
+                    !date && 'text-muted-foreground',
+                )}
+            >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, 'PPPp') : 'Select date and time'}
+                <ChevronDownIcon className="ml-auto h-4 w-4 opacity-25" />
+            </PopoverTrigger>
+            <PopoverContent>
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    captionLayout="dropdown"
+                    onSelect={(date) => {
+                        setDate(date);
+                    }}
+                />
+                <div className="p-3 border-t border-border">
+                    <TimePicker12 setDate={setDate} date={date} />
+                </div>
             </PopoverContent>
         </Popover>
     );

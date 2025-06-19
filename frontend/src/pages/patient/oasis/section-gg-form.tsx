@@ -1,10 +1,10 @@
 'use client';
 
-import {useState} from 'react';
-import {Label} from '@/components/ui/label';
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Checkbox} from '@/components/ui/checkbox';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import {
     GG0100,
@@ -16,14 +16,17 @@ import {
     type SectionGG,
     SectionGGSchema,
 } from '@ai-scribe-oasis/shared/oasis/section-gg.ts';
-import {ArrowToggles, ScoreSelect, useAccordion} from '@/pages/patient/form.tsx';
-import {createNull} from '@ai-scribe-oasis/shared/utils.ts';
+import { ArrowToggles, ScoreSelect, useAccordion } from '@/pages/patient/form.tsx';
+import { createNull } from '@ai-scribe-oasis/shared/utils.ts';
 
 
-export function SectionGGForm({initialData, setForm}: { initialData?: SectionGG, setForm: (data: SectionGG) => void }) {
+export function SectionGGForm({ initialData, setForm }: {
+    initialData?: SectionGG,
+    setForm: (data: SectionGG) => void
+}) {
     const [data, setData] = useState<SectionGG>(initialData || createNull(SectionGGSchema));
     const fields = Object.keys(SectionGGSchema.shape);
-    const {open, setOpen, openAll, closeAll} = useAccordion(fields);
+    const { open, setOpen, openAll, closeAll } = useAccordion(fields);
 
     const update = (path: (keyof SectionGG)[], cb: (draft: any) => void) => {
         const newData: any = structuredClone(data);
@@ -38,8 +41,8 @@ export function SectionGGForm({initialData, setForm}: { initialData?: SectionGG,
         <div className="space-y-6">
             <div className="flex gap-2 mb-4 items-center">
                 <h2 className="text-lg font-semibold">Section GG: Functional Abilities</h2>
-                <div className="flex-1"/>
-                <ArrowToggles onExpand={openAll} onCollapse={closeAll}/>
+                <div className="flex-1" />
+                <ArrowToggles onExpand={openAll} onCollapse={closeAll} />
             </div>
 
             <Accordion type="multiple" value={open} onValueChange={setOpen} className="w-full">
@@ -200,7 +203,7 @@ export function SectionGGForm({initialData, setForm}: { initialData?: SectionGG,
                                             <Label className="font-medium">Q. {SECTION_GG_OPTIONS.GG0170.Q}</Label>
                                             <ScoreSelect
                                                 value={data.GG0170['1'].Q}
-                                                codes={{'0': 'No', '1': 'Yes'}}
+                                                codes={{ '0': 'No', '1': 'Yes' }}
                                                 onChange={(v) =>
                                                     update(['GG0170'], (n: any) => {
                                                         n['1'].Q = v;
